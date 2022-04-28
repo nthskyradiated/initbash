@@ -14,7 +14,7 @@ IPV6_DEFROUTE="yes"
 IPV6_FAILURE_FATAL="no"
 IPV6_ADDR_GEN_MODE="stable-privacy"
 NAME="eth0"
-UUID="3a76926b-a60b-4d0b-9ae6-c94f3e6925e3"
+UUID="c774cc8b-eb90-48f7-9e8b-3899b00f525a"
 DEVICE="eth0"
 ONBOOT="yes"
 IPADDR=172.20.100.10
@@ -27,7 +27,7 @@ EOF
 systemctl restart network
 
 dnf update -y && dnf upgrade -y
-dnf install epel-release yum-utils -yy
+dnf install epel-release yum-utils wget -yy
 dnf install htop glances nginx nodejs ShellCheck npm -yy
 
 dnf remove git
