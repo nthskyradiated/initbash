@@ -17,7 +17,7 @@ NAME="eth0"
 UUID="c774cc8b-eb90-48f7-9e8b-3899b00f525a"
 DEVICE="eth0"
 ONBOOT="yes"
-IPADDR=172.20.100.10
+IPADDR=172.20.100.20
 NETMASK=255.255.255.0
 GATEWAY=172.20.100.1
 DNS1=8.8.8.8
@@ -25,14 +25,14 @@ DNS2=9.9.9.9
 EOF
 
 systemctl restart NetworkManager
-ifcfg down
-ifcfg up
+ifcfg eth0 down
+ifcfg eth0 up
 
 dnf update -y && dnf upgrade -y
 dnf install epel-release yum-utils wget -yy
 dnf install htop glances nginx nodejs npm -yy
 
-dnf remove git
+dnf remove git -yy
 dnf remove git-*
 dnf install gettext-devel openssl-devel perl-CPAN perl-devel zlib-devel curl-devel expat-devel gcc autoconf -yy
 wget https://www.kernel.org/pub/software/scm/git/git-2.36.0.tar.gz
@@ -41,7 +41,7 @@ cd git-2.36.0
 make prefix=/usr/local all
 make prefix=/usr/local install
 
-curl "https://github.com/koalaman/shellcheck/releases/download/v0.8.0/shellcheck-v0.8.0.linux.x86_64.tar.xz" -o "shellcheck.tar.xz"
+wget https://github.com/koalaman/shellcheck/releases/download/v0.8.0/shellcheck-v0.8.0.linux.x86_64.tar.xz
 sudo tar -C /usr/local/bin/ -xf shellcheck-v0.8.0.linux.x86_64.tar.xz --no-anchored 'shellcheck' --strip=1
 export PATH=usr/local/bin:$PATH
 
@@ -63,7 +63,6 @@ while
 	[ $? -ne 0 ]
 do true; done
 
-cd /home/admin/
 mkdir /home/admin/resume
 git clone https://github.com/nthskyradiated/NthSkySpace.git
 cp ./NthSkySpace/resume.json ./resume/resume.json
@@ -99,10 +98,10 @@ server {
 	location / {
 		proxy_pass http://localhost:4000;
 		proxy_http_version 1.1;
-		proxy_set_header Upgrade $http_upgrade;
+		proxy_set_header Upgrade \$http_upgrade;
 		proxy_set_header Connection 'upgrade';
-		proxy_set_header Host $host;
-		proxy_cache_bypass $http_upgrade;
+		proxy_set_header Host \$host;
+		proxy_cache_bypass \$http_upgrade;
 	}
 }
 EOF
@@ -116,7 +115,7 @@ server {
 	error_log /var/log/nginx/nthsky.me.error.log;
 
 	location / {
-		try_files $uri $uri/ =404;
+		try_files \$uri \$uri/ =404;
 	}
 }
 EOF
