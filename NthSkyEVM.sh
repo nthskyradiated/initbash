@@ -24,11 +24,13 @@ DNS1=8.8.8.8
 DNS2=9.9.9.9
 EOF
 
-systemctl restart network
+systemctl restart NetworkManager
+ifcfg down
+ifcfg up
 
 dnf update -y && dnf upgrade -y
 dnf install epel-release yum-utils wget -yy
-dnf install htop glances nginx nodejs ShellCheck npm -yy
+dnf install htop glances nginx nodejs npm -yy
 
 dnf remove git
 dnf remove git-*
@@ -38,6 +40,10 @@ tar -xvzf git-2.36.0.tar.gz
 cd git-2.36.0
 make prefix=/usr/local all
 make prefix=/usr/local install
+
+curl "https://github.com/koalaman/shellcheck/releases/download/v0.8.0/shellcheck-v0.8.0.linux.x86_64.tar.xz" -o "shellcheck.tar.xz"
+sudo tar -C /usr/local/bin/ -xf shellcheck-v0.8.0.linux.x86_64.tar.xz --no-anchored 'shellcheck' --strip=1
+export PATH=usr/local/bin:$PATH
 
 firewall-cmd --zone=public --add-port=4000/tcp
 firewall-cmd --zone=public --add-port=4433/tcp
