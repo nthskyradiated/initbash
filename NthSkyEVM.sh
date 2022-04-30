@@ -1,22 +1,13 @@
 #!/bin/bash
 
-cat > /etc/sysconfig/network-scripts/ifcfg-eth0 <<EOF
+#source as root
+dnf install nano git -yy
+dnf update -y && dnf upgrade -y
+dnf install epel-release yum-utils wget -yy
+dnf install htop glances nginx nodejs npm -yy
 
-TYPE="Ethernet"
-PROXY_METHOD="none"
-BROWSER_ONLY="no"
-BOOTPROTO="static"
-DEFROUTE="yes"
-IPV4_FAILURE_FATAL="no"
-IPV6INIT="yes"
-IPV6_AUTOCONF="yes"
-IPV6_DEFROUTE="yes"
-IPV6_FAILURE_FATAL="no"
-IPV6_ADDR_GEN_MODE="stable-privacy"
-NAME="eth0"
-UUID="c774cc8b-eb90-48f7-9e8b-3899b00f525a"
-DEVICE="eth0"
-ONBOOT="yes"
+sed '5 c\BOOTPROTO="static"' /etc/sysconfig/network-scripts/ifcfg-eth0
+cat >> /etc/sysconfig/network-scripts/ifcfg-eth0 <<EOF
 IPADDR=172.20.100.20
 NETMASK=255.255.255.0
 GATEWAY=172.20.100.1
@@ -24,13 +15,9 @@ DNS1=8.8.8.8
 DNS2=9.9.9.9
 EOF
 
-systemctl restart NetworkManager
 ifcfg eth0 down
 ifcfg eth0 up
-
-dnf update -y && dnf upgrade -y
-dnf install epel-release yum-utils wget -yy
-dnf install htop glances nginx nodejs npm -yy
+#systemctl restart NetworkManager
 
 dnf remove git -yy
 dnf remove git-*
@@ -38,12 +25,13 @@ dnf install gettext-devel openssl-devel perl-CPAN perl-devel zlib-devel curl-dev
 wget https://www.kernel.org/pub/software/scm/git/git-2.36.0.tar.gz
 tar -xvzf git-2.36.0.tar.gz
 cd git-2.36.0
+export PATH=$PATH:/usr/local/bin
 make prefix=/usr/local all
 make prefix=/usr/local install
 
 wget https://github.com/koalaman/shellcheck/releases/download/v0.8.0/shellcheck-v0.8.0.linux.x86_64.tar.xz
 sudo tar -C /usr/local/bin/ -xf shellcheck-v0.8.0.linux.x86_64.tar.xz --no-anchored 'shellcheck' --strip=1
-export PATH=usr/local/bin:$PATH
+
 
 firewall-cmd --zone=public --add-port=4000/tcp
 firewall-cmd --zone=public --add-port=4433/tcp
@@ -63,6 +51,7 @@ while
 	[ $? -ne 0 ]
 do true; done
 
+cd /home/admin
 mkdir /home/admin/resume
 git clone https://github.com/nthskyradiated/NthSkySpace.git
 cp ./NthSkySpace/resume.json ./resume/resume.json
