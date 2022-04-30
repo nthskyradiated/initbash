@@ -6,7 +6,8 @@ dnf update -y && dnf upgrade -y
 dnf install epel-release yum-utils wget -yy
 dnf install htop glances nginx nodejs npm -yy
 
-sed '5 c\BOOTPROTO="static"' /etc/sysconfig/network-scripts/ifcfg-eth0
+sed '4 c\BOOTPROTO=static' /etc/sysconfig/network-scripts/ifcfg-eth0 > /etc/sysconfig/network-scripts/ifcfg-eth0.old && mv -f /etc/sysconfig/network-scripts/ifcfg-eth0.old /etc/sysconfig/network-scripts/ifcfg-eth0
+
 cat >> /etc/sysconfig/network-scripts/ifcfg-eth0 <<EOF
 IPADDR=172.20.100.20
 NETMASK=255.255.255.0
@@ -15,8 +16,8 @@ DNS1=8.8.8.8
 DNS2=9.9.9.9
 EOF
 
-ifcfg eth0 down
-ifcfg eth0 up
+ifdown eth0
+ifup eth0
 #systemctl restart NetworkManager
 
 dnf remove git -yy
