@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #source as root
-dnf install nano git -yy
+dnf install nano git tar -yy
 dnf update -y && dnf upgrade -y
 dnf install epel-release yum-utils wget -yy
 dnf install htop glances nginx nodejs npm -yy
