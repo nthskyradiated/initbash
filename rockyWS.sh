@@ -3,7 +3,7 @@
 dnf install nano git tar -yy
 dnf update -y && dnf upgrade -y
 dnf install epel-release yum-utils wget -yy
-dnf install ntfs-3g htop glances nginx nodejs npm -yy
+dnf install ntfs-3g htop glances nginx nodejs npm python3-certbot-nginx -yy
 
 #install Terraform VSCode Azure-CLI AWS-CLI
 yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo

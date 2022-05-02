@@ -4,7 +4,7 @@
 dnf install nano git tar -yy
 dnf update -y && dnf upgrade -y
 dnf install epel-release yum-utils wget -yy
-dnf install htop glances nginx nodejs npm -yy
+dnf install htop glances nginx nodejs npm python3-certbot-nginx policycoreutils-python-utils -yy
 
 sed '4 c\BOOTPROTO=static' /etc/sysconfig/network-scripts/ifcfg-eth0 > /etc/sysconfig/network-scripts/ifcfg-eth0.old && mv -f /etc/sysconfig/network-scripts/ifcfg-eth0.old /etc/sysconfig/network-scripts/ifcfg-eth0
 
@@ -79,6 +79,10 @@ npm install jsonresume-theme-spartan -g
 
 cat > /etc/nginx/conf.d/andypandaan.info.conf <<EOF
 server {
+	listen 443 ssl;
+	listen 4433;
+	listen 4000 ssl;
+	listen 80;
 	root /home/admin/resume;
 	index index.html index.htm index.js;
 	server_name andypandaan.info www.andypandaan.info;
@@ -98,6 +102,9 @@ EOF
 
 cat > /etc/nginx/conf.d/nthsky.me.conf <<EOF
 server {
+	listen 80 default_server;
+	listen [::]:80 default_server;
+	listen 443 ssl;
 	root /usr/share/nginx/html/NthSkySpace;
 	index index.html index.htm;
 	server_name nthsky.me www.nthsky.me;
@@ -110,4 +117,17 @@ server {
 }
 EOF
 
+chown nginx:nginx /etc/nginx/conf.d/nthsky.me.conf /etc/nginx/conf.d/andypandaan.info.conf
+chown -R nginx:nginx /usr/share/nginx/html/NthSkySpace/ /home/admin/resume
+chmod +x /home
+chmod +x /home/admin
+chmod +x /home/admin/resume
+chmod 777 /home/admin/resume/public
+chmod +x /usr
+chmod +x /usr/share
+chmod +x /usr/share/nginx
+chmod +x /usr/share/nginx/html
+chmod +x /usr/share/nginx/html/NthSkySpace
+semanage port -a -t http_port_t -p tcp 4000
+#certbot --nginx -d nthsky.me -d andypandaan.info -d www.nthsky.me -d www.andypandaan.info
 systemctl restart nginx
