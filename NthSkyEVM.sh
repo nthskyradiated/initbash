@@ -4,7 +4,7 @@
 dnf install nano git tar -yy
 dnf update -y && dnf upgrade -y
 dnf install epel-release yum-utils wget -yy
-dnf install htop glances nginx nodejs npm python3-certbot-nginx policycoreutils-python-utils -yy
+dnf install htop glances net-tools nginx nodejs npm python3-certbot-nginx policycoreutils-python-utils -yy
 
 sed '4 c\BOOTPROTO=static' /etc/sysconfig/network-scripts/ifcfg-eth0 > /etc/sysconfig/network-scripts/ifcfg-eth0.old && mv -f /etc/sysconfig/network-scripts/ifcfg-eth0.old /etc/sysconfig/network-scripts/ifcfg-eth0
 
@@ -26,13 +26,12 @@ dnf install gettext-devel openssl-devel perl-CPAN perl-devel zlib-devel curl-dev
 wget https://www.kernel.org/pub/software/scm/git/git-2.36.0.tar.gz
 tar -xvzf git-2.36.0.tar.gz
 cd git-2.36.0
-export PATH=$PATH:/usr/local/bin
 make prefix=/usr/local all
 make prefix=/usr/local install
 
 wget https://github.com/koalaman/shellcheck/releases/download/v0.8.0/shellcheck-v0.8.0.linux.x86_64.tar.xz
 sudo tar -C /usr/local/bin/ -xf shellcheck-v0.8.0.linux.x86_64.tar.xz --no-anchored 'shellcheck' --strip=1
-
+export PATH=$PATH:/usr/local/bin
 
 firewall-cmd --zone=public --add-port=4000/tcp
 firewall-cmd --zone=public --add-port=4433/tcp
@@ -80,8 +79,6 @@ npm install jsonresume-theme-spartan -g
 cat > /etc/nginx/conf.d/andypandaan.info.conf <<EOF
 server {
 	listen 443 ssl;
-	listen 4433;
-	listen 4000 ssl;
 	listen 80;
 	root /home/admin/resume;
 	index index.html index.htm index.js;
@@ -122,12 +119,19 @@ chown -R nginx:nginx /usr/share/nginx/html/NthSkySpace/ /home/admin/resume
 chmod +x /home
 chmod +x /home/admin
 chmod +x /home/admin/resume
+mkdir /home/admin/resume/public
 chmod 777 /home/admin/resume/public
 chmod +x /usr
 chmod +x /usr/share
 chmod +x /usr/share/nginx
 chmod +x /usr/share/nginx/html
 chmod +x /usr/share/nginx/html/NthSkySpace
+
 semanage port -a -t http_port_t -p tcp 4000
+cp /etc/sysconfig/selinux /etc/sysconfig/selinux.old
+sed '7 c\SELINUX=disabled' /etc/sysconfig/selinux > /etc/sysconfig/selinux.new && mv -f /etc/sysconfig/selinux.new /etc/sysconfig/selinux
+
+#command below assumes all required ports are open on the firewall: 80, 443, 4000
 #certbot --nginx -d nthsky.me -d andypandaan.info -d www.nthsky.me -d www.andypandaan.info
-systemctl restart nginx
+#remove default_server from nginx.conf
+#reboot now
